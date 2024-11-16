@@ -1,4 +1,4 @@
-module github.com/aloys.zy/aloysapplication-operator
+module github.com/aloys.zy/aloys-application-operator
 
 go 1.22.0
 

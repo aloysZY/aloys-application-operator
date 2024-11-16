@@ -6,5 +6,5 @@ domain: aloys.cn
 layout:
 - go.kubebuilder.io/v4
 projectName: aloys-application-operator
-repo: github.com/aloys.zy/aloysapplication-operator
+repo: github.com/aloys.zy/aloys-application-operator
 version: "3"

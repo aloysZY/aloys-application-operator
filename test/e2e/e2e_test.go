@@ -27,7 +27,7 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
-	"github.com/aloys.zy/aloysapplication-operator/test/utils"
+	"github.com/aloys.zy/aloys-application-operator/test/utils"
 )
 
 // namespace where the project is deployed in
