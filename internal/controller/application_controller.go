@@ -148,6 +148,7 @@ func (r *ApplicationReconciler) SetupWithManager(mgr ctrl.Manager) error {
 					return false
 				}
 				// 如果新旧spec字段相同也不触发调谐
+				// 这里要断言的类型应该是需要监听的类型，不能断言Application
 				if reflect.DeepEqual(e.ObjectNew.(*appsv1.Deployment).Spec, e.ObjectOld.(*appsv1.Deployment).Spec) {
 					return false
 				}
@@ -177,6 +178,7 @@ func (r *ApplicationReconciler) SetupWithManager(mgr ctrl.Manager) error {
 					return false
 				}
 				// 如果新旧spec字段相同也不触发调谐
+				// 这里要断言的类型应该是需要监听的类型，不能断言Application
 				if reflect.DeepEqual(e.ObjectNew.(*corev1.Service).Spec, e.ObjectOld.(*corev1.Service).Spec) {
 					return false
 				}
