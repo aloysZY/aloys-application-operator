@@ -21,7 +21,7 @@ import (
 	"flag"
 	"os"
 
-	appsv1 "k8s.io/api/apps/v1"
+	appv1 "github.com/aloys.zy/aloys-application-operator/api/v1"
 	// Import all Kubernetes client auth plugins (e.g. Azure, GCP, OIDC, etc.)
 	// to ensure that exec-entrypoint and run can make use of them.
 	_ "k8s.io/client-go/plugin/pkg/client/auth"
@@ -48,7 +48,7 @@ var (
 func init() {
 	utilruntime.Must(clientgoscheme.AddToScheme(scheme))
 
-	utilruntime.Must(appsv1.AddToScheme(scheme))
+	utilruntime.Must(appv1.AddToScheme(scheme))
 	// +kubebuilder:scaffold:scheme
 }
 

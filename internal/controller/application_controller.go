@@ -45,10 +45,11 @@ type ApplicationReconciler struct {
 // +kubebuilder:rbac:groups=apps.aloys.cn,resources=applications,verbs=get;list;watch;create;update;patch;delete
 // +kubebuilder:rbac:groups=apps.aloys.cn,resources=applications/status,verbs=get;update;patch
 // +kubebuilder:rbac:groups=apps.aloys.cn,resources=applications/finalizers,verbs=update
-// +kubebuilder:rbac:groups=apps.aloys,resources=deployments,verbs=get;list;watch;create;update;patch;delete
-// +kubebuilder:rbac:groups=apps.aloys,resources=deployments/status,verbs=get
-// +kubebuilder:rbac:groups=apps.aloys,resources=services,verbs=get;list;watch;create;update;patch;delete
-// +kubebuilder:rbac:groups=apps.aloys,resources=services/status,verbs=get
+
+// +kubebuilder:rbac:groups=apps,resources=deployments,verbs=get;list;watch;create;update;patch;delete
+// +kubebuilder:rbac:groups=apps,resources=deployments/status,verbs=get
+// +kubebuilder:rbac:groups=core,resources=services,verbs=get;list;watch;create;update;patch;delete
+// +kubebuilder:rbac:groups=core,resources=services/status,verbs=get
 
 // CounterReconcileApplication 记录当前调谐的轮次
 var CounterReconcileApplication int64
@@ -73,7 +74,7 @@ func (r *ApplicationReconciler) Reconcile(ctx context.Context, req ctrl.Request)
 	// time.NewTicker 函数用于创建一个新的定时器（ticker），它会定期发送时间信号到一个通道（channel）。<-time.NewTicker(1000 * time.Millisecond).C 这一行代码的作用是从这个定时器的通道中接收时间信号。
 	<-time.NewTicker(1000 * time.Millisecond).C
 	CounterReconcileApplication += 1
-	log.V(2).Info("Starting a reconcile", "number", CounterReconcileApplication)
+	log.Info("Starting a reconcile", "number", CounterReconcileApplication)
 	// 获取 Application 对象的状态
 	application := &appv1.Application{}
 	if err := r.Get(ctx, req.NamespacedName, application); err != nil {
@@ -97,7 +98,7 @@ func (r *ApplicationReconciler) Reconcile(ctx context.Context, req ctrl.Request)
 		return result, err
 	}
 	// 如果没有发生任何 error，返回一个空的Result，表示没有需要重试的操作，控制器可以结束当前的 reconcile loop，并开始下一个 reconcile loop。
-	log.V(2).Info("Finished a reconcile", "number", CounterReconcileApplication)
+	log.Info("Finished a reconcile", "number", CounterReconcileApplication)
 	return ctrl.Result{}, nil
 }
 
@@ -110,7 +111,7 @@ func (r *ApplicationReconciler) SetupWithManager(mgr ctrl.Manager) error {
 		For(&appv1.Application{}, builder.WithPredicates(predicate.Funcs{
 			// create 是肯定要触发的
 			CreateFunc: func(e event.CreateEvent) bool {
-				seruplog.V(2).Info("The Application has been Created.", "name", e.Object.GetName())
+				seruplog.Info("The Application has been Created.", "name", e.Object.GetName())
 				return true
 			},
 			//
@@ -124,13 +125,13 @@ func (r *ApplicationReconciler) SetupWithManager(mgr ctrl.Manager) error {
 					return false
 				}
 				// 其他情况下进行调谐
-				seruplog.V(2).Info("The Application has been Updated.", "name", e.ObjectNew.GetName())
+				seruplog.Info("The Application has been Updated.", "name", e.ObjectNew.GetName())
 				return true
 				// return !reflect.DeepEqual(e.ObjectOld.GetResourceVersion(), e.ObjectNew.GetResourceVersion())
 			},
 			// 删除的时候不需要触发，因为有SetControllerReference子资源的存在
 			DeleteFunc: func(e event.DeleteEvent) bool {
-				seruplog.V(2).Info("The Application has been Deleted.", "name", e.Object.GetName())
+				seruplog.Info("The Application has been Deleted.", "name", e.Object.GetName())
 				return false
 			},
 		})).
@@ -147,16 +148,16 @@ func (r *ApplicationReconciler) SetupWithManager(mgr ctrl.Manager) error {
 					return false
 				}
 				// 如果新旧spec字段相同也不触发调谐
-				if reflect.DeepEqual(e.ObjectNew.(*appv1.Application).Spec, e.ObjectOld.(*appv1.Application).Spec) {
+				if reflect.DeepEqual(e.ObjectNew.(*appsv1.Deployment).Spec, e.ObjectOld.(*appsv1.Deployment).Spec) {
 					return false
 				}
 				// 其他情况下进行调谐
-				seruplog.V(2).Info("The Application Deployment has been Updated.", "name", e.ObjectNew.GetName())
+				seruplog.Info("The Application Deployment has been Updated.", "name", e.ObjectNew.GetName())
 				return true
 			},
 			// 如果这个deployment被误删除了，应该能主动创建，所以触发调谐
 			DeleteFunc: func(e event.DeleteEvent) bool {
-				seruplog.V(2).Info("The Application Deployment has been Deleted.", "name", e.Object.GetName())
+				seruplog.Info("The Application Deployment has been Deleted.", "name", e.Object.GetName())
 				return true
 			},
 		})).
@@ -176,16 +177,16 @@ func (r *ApplicationReconciler) SetupWithManager(mgr ctrl.Manager) error {
 					return false
 				}
 				// 如果新旧spec字段相同也不触发调谐
-				if reflect.DeepEqual(e.ObjectNew.(*appv1.Application).Spec, e.ObjectOld.(*appv1.Application).Spec) {
+				if reflect.DeepEqual(e.ObjectNew.(*corev1.Service).Spec, e.ObjectOld.(*corev1.Service).Spec) {
 					return false
 				}
 				// 其他情况下进行调谐
-				seruplog.V(2).Info("The Application Service has been Updated.", "name", e.ObjectNew.GetName())
+				seruplog.Info("The Application Service has been Updated.", "name", e.ObjectNew.GetName())
 				return true
 			},
 			// 如果这个service被误删除了，应该能主动创建，所以触发调谐
 			DeleteFunc: func(e event.DeleteEvent) bool {
-				seruplog.V(2).Info("The Application Service has been Deleted.", "name", e.Object.GetName())
+				seruplog.Info("The Application Service has been Deleted.", "name", e.Object.GetName())
 				return true
 			},
 		})).

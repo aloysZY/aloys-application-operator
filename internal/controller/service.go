@@ -34,7 +34,7 @@ func (r *ApplicationReconciler) reconcileService(ctx context.Context, applicatio
 		log.Info("The service has already exist.", "ServiceNamespace", appNamespace, "ServiceName", appName)
 		// 判断application.Status是不是最新的,最新的就结束本次调谐
 		if reflect.DeepEqual(svc.Status, application.Status.Network) {
-			// log.V(2).Info("The service status is already the same as the desired status.", "ServiceNamespace", appNamespace, "ServiceName", appName)
+			// log.Info("The service status is already the same as the desired status.", "ServiceNamespace", appNamespace, "ServiceName", appName)
 			return ctrl.Result{}, nil
 		}
 		// 不是最新的就进行赋值，更新状态,更新失败进行重试
@@ -43,7 +43,7 @@ func (r *ApplicationReconciler) reconcileService(ctx context.Context, applicatio
 			log.Error(err, "Failed to update the service status.", "ServiceNamespace", appNamespace, "ServiceName", appName)
 			return ctrl.Result{RequeueAfter: GenericRequeueDuration}, err
 		}
-		log.V(2).Info("The Application Network status has been updated.", "name", appNamespace, "name", appName)
+		log.Info("The Application Network status has been updated.", "name", appNamespace, "name", appName)
 		return ctrl.Result{}, nil
 	}
 	// 先进行判断是不是不存在之外的错误场景，不是不存的错误就直接重试
@@ -66,6 +66,6 @@ func (r *ApplicationReconciler) reconcileService(ctx context.Context, applicatio
 		log.Error(err, "Failed to create the Service.", "ServiceNamespace", appNamespace, "ServiceName", appName)
 		return ctrl.Result{RequeueAfter: GenericRequeueDuration}, err
 	}
-	log.V(2).Info("The Service has been created.", "ServiceNamespace", appNamespace, "ServiceName", appName)
+	log.Info("The Service has been created.", "ServiceNamespace", appNamespace, "ServiceName", appName)
 	return ctrl.Result{}, nil
 }
